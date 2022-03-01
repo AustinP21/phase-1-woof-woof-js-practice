@@ -1,20 +1,29 @@
 document.addEventListener("DOMContentLoaded", init)
 
-function init(){
-  const filterDogsButton = document.querySelector("#good-dog-filter")
-  filterDogsButton.addEventListener("click", toggleFilterDogs)
-  getDogs().then(addAllDogsToDogBar)
+const baseURL = "http://localhost:3000/pups"
+
+function getDogs(){
+  return fetch(baseURL)
+    .then(r => r.json())
 }
 
-function toggleFilterDogs(){
-  const filterDogsButton = document.querySelector("#good-dog-filter")
-  if (filterDogsButton.innerText.includes("OFF")){
-    filterDogsButton.innerText = "Filter good dogs: ON"
-    updateDogBar()
-  } else {
-    filterDogsButton.innerText = "Filter good dogs: OFF"
-    updateDogBar()
+function getSingleDog(id){
+  return fetch(baseURL + `/${id}`)
+    .then(r => r.json() )
+}
+
+function toggleGoodDog(id, newValue){
+  const options = {
+    method: "PATCH",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      isGoodDog: newValue
+    })
   }
+  return fetch(baseURL + `/${id}`, options)
+    .then(r => r.json())
 }
 
 function addAllDogsToDogBar(dogArray, filter = false){
@@ -81,28 +90,19 @@ function updateDogBar(){
   }
 }
 
-const baseURL = "http://localhost:3000/pups"
-
-function getDogs(){
-  return fetch(baseURL)
-    .then(r => r.json())
-}
-
-function getSingleDog(id){
-  return fetch(baseURL + `/${id}`)
-    .then(r => r.json() )
-}
-
-function toggleGoodDog(id, newValue){
-  const options = {
-    method: "PATCH",
-    headers: {
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
-      isGoodDog: newValue
-    })
+function init(){
+    const filterDogsButton = document.querySelector("#good-dog-filter")
+    filterDogsButton.addEventListener("click", toggleFilterDogs)
+    getDogs().then(addAllDogsToDogBar)
   }
-  return fetch(baseURL + `/${id}`, options)
-    .then(r => r.json())
-}
+  
+  function toggleFilterDogs(){
+    const filterDogsButton = document.querySelector("#good-dog-filter")
+    if (filterDogsButton.innerText.includes("OFF")){
+      filterDogsButton.innerText = "Filter good dogs: ON"
+      updateDogBar()
+    } else {
+      filterDogsButton.innerText = "Filter good dogs: OFF"
+      updateDogBar()
+    }
+  }
